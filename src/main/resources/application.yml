@@ -1,0 +1,29 @@
+amazonProperties:
+  endpointUrl: https://s3.amazonaws.com
+  accessKey: AKIAJTTOYLOJ644WBAQQ
+  secretKey: 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
+  bucketName: test-aws-java
+
+server:
+  port: 8080
+
+spring:
+  http:
+    converters:
+      preferred-json-mapper: gson
+  gson:
+    pretty-printing: true
+  datasource:
+    url: jdbc:mysql://190.117.136.82:3306/bd_tarjetic?useSSL=false
+    username: admin
+    password: giacia12
+    testWhileIdle: true
+    validationQuery: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+##Extra option to cloud deployment
+management:
+  security:
+    enabled: false
