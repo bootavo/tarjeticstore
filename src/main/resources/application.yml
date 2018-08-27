@@ -2,7 +2,8 @@ amazonProperties:
   endpointUrl: https://s3.amazonaws.com
   accessKey: AKIAJTTOYLOJ644WBAQQ
   secretKey: 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
-  bucketName: test-aws-java
+  bucketTarjetic: test-aws-java
+  bucketUsers: users
 
 server:
   port: 8080

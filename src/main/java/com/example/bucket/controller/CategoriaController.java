@@ -22,7 +22,12 @@ public class CategoriaController {
     }
 
     @GetMapping(path={"/category", "/category/"})
-    public @ResponseBody JsonObject getAllUsers() {
+    public @ResponseBody JsonObject getCategories() {
         return service.getCategories();
+    }
+
+    @GetMapping(path={"/category/{id_categoria}", "/category/{id_categoria}/"})
+    public @ResponseBody JsonObject getCategoriaById(@PathVariable(value="id_categoria")int id_categoria){
+        return service.getCategoryById(id_categoria);
     }
 }

@@ -20,8 +20,12 @@ public class ProductController {
 
     @PostMapping(path= {"/product", "/product/"})
     public @ResponseBody JsonObject registerProduct(@RequestBody Product request) {
-
         return service.registerProduct(request);
+    }
+
+    @GetMapping(path={"/product/{id_producto}","/product/{id_producto}"})
+    public @ResponseBody JsonObject getProductById(@PathVariable(value="id_producto") int id_producto){
+        return service.getProductById(id_producto);
     }
 
 }

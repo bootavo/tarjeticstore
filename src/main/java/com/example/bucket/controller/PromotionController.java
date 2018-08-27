@@ -23,4 +23,9 @@ public class PromotionController {
         return service.getPromotionsModified();
     }
 
+    @GetMapping(path = {"promotion/{id_promocion}","promotion/{id_promocion}/"})
+    public @ResponseBody JsonObject getPromotionById(@PathVariable(value="id_promocion") int id_promocion){
+        return service.getPromotionById(id_promocion);
+    }
+
 }

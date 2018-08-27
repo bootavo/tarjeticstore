@@ -119,7 +119,7 @@ public class UserService implements UserExtraRepository {
             user.setId_rol(userRequest.getId_rol());
             user.setId_persona(id_persona);
             user.setPedidos_cancelados(0);
-            user.setCodigo_app(UUIDHelper.generateString());
+            user.setCodigo_app(userRequest.getCodigo_app());
             user.setTipo_registro(Constants.REGISTER_APP);
             repositoryUser.save(user);
 
@@ -135,6 +135,7 @@ public class UserService implements UserExtraRepository {
             inventory.setEstado("A");
             repositoryInventory.save(inventory);
 
+            userRequest.setTotal_fichas(inventory.getTotal_fichas());
             userRequest.setId_persona(id_persona);
             userRequest.setId_usuario(id_usuario);
 
@@ -169,6 +170,76 @@ public class UserService implements UserExtraRepository {
         }
         logger.info("#--------------FIN DE SERVICIO--------------#");
         return jsonResponse;
+    }
+
+    @Transactional(/*readOnly = true, */noRollbackFor = EmptyResultDataAccessException.class)
+    public JsonObject registerUserWithImage(UserRequest userRequest) {
+
+        logger.info("#--------------INICIO DE SERVICIO registerUser--------------#");
+        JsonObject jsonResponse = null;
+
+        try {
+            logger.info("--- try: ");
+
+            logger.info("#-----> obteniendo id_persona");
+            Query query = em.createNativeQuery("select COALESCE(max(id_persona)+1, 1) as id_persona from t_persona; ");
+            List<BigInteger> resultList = query.getResultList();
+            int id_persona = Integer.parseInt(resultList.get(0).toString());
+            logger.info("#--id_persona: "+id_persona+"--------------#");
+
+            Persona persona = new Persona();
+            persona.setId_persona(id_persona);
+            persona.setNombres(userRequest.getNombres());
+            persona.setApellidos(userRequest.getApellidos());
+            persona.setDireccion(userRequest.getDireccion());
+            persona.setDni(userRequest.getDni());
+            persona.setImagen(userRequest.getImagen());
+            persona.setCorreo(userRequest.getCorreo());
+            persona.setTelefono_contacto(userRequest.getTelefono_contacto());
+            repository.save(persona);
+
+            Query query_user = em.createNativeQuery("select COALESCE(max(id_usuario)+1, 1) as id_usuario from t_usuario; ");
+            List<BigInteger> resultUser = query_user.getResultList();
+            int id_usuario = Integer.parseInt(resultUser.get(0).toString());
+            logger.info("#--id_usuario: "+id_usuario+"--------------#");
+
+            User user = new User();
+            user.setId_usuario(id_usuario);
+            user.setUsuario(userRequest.getUsuario());
+            user.setClave(userRequest.getClave());
+            user.setEstado("A");
+            user.setId_rol(userRequest.getId_rol());
+            user.setId_persona(id_persona);
+            user.setPedidos_cancelados(0);
+            user.setCodigo_app(userRequest.getCodigo_app());
+            user.setTipo_registro(Constants.REGISTER_APP);
+            repositoryUser.save(user);
+
+            Query query_inventory = em.createNativeQuery("select COALESCE(max(id_inventario)+1, 1) as id_inventario from t_inventario; ");
+            List<BigInteger> resultInventory = query_inventory.getResultList();
+            int id_inventory = Integer.parseInt(resultInventory.get(0).toString());
+            logger.info("#--id_inventory: "+id_inventory+"--------------#");
+
+            Inventory inventory = new Inventory();
+            inventory.setId_inventario(id_inventory);
+            inventory.setId_usuario(id_usuario);
+            inventory.setTotal_fichas(Constants.START_COINS);
+            inventory.setEstado("A");
+            repositoryInventory.save(inventory);
+
+            userRequest.setTotal_fichas(inventory.getTotal_fichas());
+            userRequest.setId_persona(id_persona);
+            userRequest.setId_usuario(id_usuario);
+
+        }catch (Exception e){
+            logger.info("Exception: "+e);
+        }finally {
+            ResponseHelper helper = new ResponseHelper();
+            jsonResponse = helper.buildResponseObject(userRequest, "user");
+        }
+        logger.info("#--------------FIN DE SERVICIO registerUser--------------#");
+        return jsonResponse;
+
     }
 
 }

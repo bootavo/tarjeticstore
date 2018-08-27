@@ -81,26 +81,25 @@ public class PromotionService implements PromotionExtraRepository {
     }
 
     public @ResponseBody JsonObject getPromotions(){
-        logger.info("#--------------INICIO DE SERVICIO getProductos()--------------#");
+        logger.info("#--------------INICIO DE SERVICIO getPromotions()--------------#");
         JsonObject jsonResponse = null;
         List<Promotion> data = null;
         try {
             data = (List<Promotion>) repository.findAll();
         }catch (Exception e){
             logger.info("Exception: "+e);
-            e.printStackTrace();
             data = null;
         }finally {
             ResponseHelper helper = new ResponseHelper();
             jsonResponse = helper.buildResponseObject(data, "promociones");
         }
-        logger.info("#--------------FIN DE SERVICIO getProductos()--------------#");
+        logger.info("#--------------FIN DE SERVICIO getPromotions()--------------#");
         return jsonResponse;
     }
 
     @Override
     public JsonObject getPromotionsModified() {
-        logger.info("#--------------INICIO DE SERVICIO login--------------#");
+        logger.info("#--------------INICIO DE SERVICIO getPromotionsModified--------------#");
         JsonObject jsonResponse = null;
         List<Promotion> data = null;
         try {
@@ -115,7 +114,29 @@ public class PromotionService implements PromotionExtraRepository {
             ResponseHelper helper = new ResponseHelper();
             jsonResponse = helper.buildResponseObject(data, "promociones");
         }
-        logger.info("#--------------FIN DE SERVICIO--------------#");
+        logger.info("#--------------FIN DE getPromotionsModified--------------#");
         return jsonResponse;
     }
+
+    @Override
+    public JsonObject getPromotionById(int id_promocion) {
+        logger.info("#--------------INICIO DE SERVICIO getPromotionById()--------------#");
+        JsonObject jsonResponse = null;
+        Promotion data = null;
+        try {
+            data = (Promotion) em.createNativeQuery(" select pr.id_promocion, pr.nombre, pr.descripcion, pr.estado, pr.precio, pr.precio_fichas, pr.imagen, "+
+                    " (select count(*) from t_promocion_producto pp " +
+                    " where pp.id_promocion = pr.id_promocion) as cantidad_productos  "+
+                    " from t_promocion pr where pr.id_promocion = '"+id_promocion+"' ", Promotion.class).getSingleResult();
+        }catch (Exception e){
+            logger.info("Exception: "+e);
+            data = null;
+        }finally {
+            ResponseHelper helper = new ResponseHelper();
+            jsonResponse = helper.buildResponseObject(data, "promocion");
+        }
+        logger.info("#--------------FIN DE SERVICIO getPromotionById()--------------#");
+        return jsonResponse;
+    }
+
 }

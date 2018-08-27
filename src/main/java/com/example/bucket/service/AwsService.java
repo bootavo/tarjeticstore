@@ -5,9 +5,13 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.CreateBucketRequest;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.example.bucket.repository.AwsRepository;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,12 +29,17 @@ public class AwsService implements AwsRepository {
 
     @Value("${amazonProperties.endpointUrl}")
     private String endpointUrl;
-    @Value("${amazonProperties.bucketName}")
-    private String bucketName;
+    @Value("${amazonProperties.bucketTarjetic}")
+    private String bucketTarjetic;
+    @Value("${amazonProperties.bucketUsers}")
+    private String bucketUsers;
     @Value("${amazonProperties.accessKey}")
     private String accessKey;
     @Value("${amazonProperties.secretKey}")
     private String secretKey;
+    private String bucketCustom;
+
+    private static Logger logger = LogManager.getLogger(AwsService.class);
 
     @PostConstruct
     private void initializeAmazon() {
@@ -44,10 +53,19 @@ public class AwsService implements AwsRepository {
         try {
             File file = convertMultiPartToFile(multipartFile);
             String fileName = generateFileName(multipartFile, name);
-            fileUrl = endpointUrl + "/" + bucketName + "/" + fileName;
+
+            //Create personal bucket
+            if (!s3client.doesBucketExist(bucketTarjetic)) {
+                s3client.createBucket(new CreateBucketRequest(name));
+            }
+
+            bucketCustom = name;
+            fileUrl = endpointUrl + "/" + bucketTarjetic + "/" + bucketUsers + "/" + bucketCustom + "/" + fileName;
+
             uploadFileTos3bucket(fileName, file);
             file.delete();
         } catch (Exception e) {
+            fileUrl = null;
            e.printStackTrace();
         }
         return fileUrl;
@@ -64,19 +82,27 @@ public class AwsService implements AwsRepository {
 
     @Override
     public String generateFileName(MultipartFile multiPart, String name) {
-        return new Date().getTime() + "-" + name + multiPart.getOriginalFilename().replace(" ", "_");
+
+        String original_name = multiPart.getOriginalFilename().replace(" ", "_");
+
+        String based_name = FilenameUtils.getBaseName(original_name);
+        String extension = "."+FilenameUtils.getExtension(original_name);
+
+        return name + "-" + new Date().getTime() + extension;
     }
 
     @Override
     public void uploadFileTos3bucket(String fileName, File file) {
-        s3client.putObject(new PutObjectRequest(bucketName, fileName, file)
+        String bucket = bucketTarjetic + "/" + bucketUsers + "/" + bucketCustom;
+        s3client.putObject(new PutObjectRequest(bucket, fileName, file)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
     }
 
     @Override
     public String deleteFileFromS3Bucket(String fileUrl) {
+        String bucket = bucketTarjetic + "/" + bucketUsers + "/" + bucketCustom;
         String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
-        s3client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
+        s3client.deleteObject(new DeleteObjectRequest(bucket, fileName));
         return "Successfully deleted";
     }
 

@@ -1,6 +1,7 @@
 package com.example.bucket.service;
 
 import com.example.bucket.model.Category;
+import com.example.bucket.model.Promotion;
 import com.example.bucket.repository.CategoriaRepository;
 import com.example.bucket.utils.PrettyJson;
 import com.example.bucket.utils.ResponseHelper;
@@ -67,13 +68,29 @@ public class CategoryService {
             data = (List<Category>) repository.findAll();
         }catch (Exception e){
             logger.info("Exception: "+e);
-            e.printStackTrace();
             data = null;
         }finally {
             ResponseHelper helper = new ResponseHelper();
             jsonResponse = helper.buildResponseObject(data, "categorias");
         }
         logger.info("#--------------FIN DE SERVICIO getCategories()--------------#");
+        return jsonResponse;
+    }
+
+    public @ResponseBody JsonObject getCategoryById(int id_categoria){
+        logger.info("#--------------INICIO DE SERVICIO getCategoryById()--------------#");
+        JsonObject jsonResponse = null;
+        Category data = null;
+        try {
+            data = repository.findById(id_categoria).get();
+        }catch (Exception e){
+            logger.info("Exception: "+e);
+            data = null;
+        }finally {
+            ResponseHelper helper = new ResponseHelper();
+            jsonResponse = helper.buildResponseObject(data, "categoria");
+        }
+        logger.info("#--------------FIN DE SERVICIO getCategoryById()--------------#");
         return jsonResponse;
     }
 

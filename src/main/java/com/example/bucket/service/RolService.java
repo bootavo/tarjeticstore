@@ -79,4 +79,21 @@ public class RolService {
         return jsonResponse;
     }
 
+    public @ResponseBody JsonObject getRolById(int id_rol){
+        logger.info("#--------------INICIO DE SERVICIO getRolById()--------------#");
+        JsonObject jsonResponse = null;
+        Rol data = null;
+        try {
+            data = repository.findById(id_rol).get();
+        }catch (Exception e){
+            logger.info("Exception: "+e);
+            data = null;
+        }finally {
+            ResponseHelper helper = new ResponseHelper();
+            jsonResponse = helper.buildResponseObject(data, "rol");
+        }
+        logger.info("#--------------FIN DE SERVICIO getRolById()--------------#");
+        return jsonResponse;
+    }
+
 }

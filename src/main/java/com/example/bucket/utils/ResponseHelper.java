@@ -40,7 +40,6 @@ public class ResponseHelper {
 
         }catch (Exception e){
             logger.error("Exception: "+e);
-            e.printStackTrace();
         }
 
         return jsonResponse;

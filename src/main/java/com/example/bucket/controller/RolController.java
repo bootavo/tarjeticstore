@@ -5,10 +5,7 @@ import com.example.bucket.service.RolService;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping(path="/api")
@@ -24,6 +21,11 @@ public class RolController {
     @RequestMapping(value = {"/rol", "/rol/"}, method = RequestMethod.POST)
     public @ResponseBody JsonObject registerRol(@RequestBody Rol rol) {
         return service.registerRol(rol);
+    }
+
+    @GetMapping(value = {"/rol/{id_rol}","/rol/{id_rol}/"})
+    public @ResponseBody JsonObject getRolById(@PathVariable(value = "id_rol") int id_rol){
+        return service.getRolById(id_rol);
     }
 
 }

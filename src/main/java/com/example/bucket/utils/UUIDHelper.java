@@ -9,6 +9,6 @@ public class UUIDHelper {
 
     public static String generateString() {
         String uuid = UUID.randomUUID().toString();
-        return uuid.substring(0,4);
+        return uuid.substring(0,6).toUpperCase();
     }
 }

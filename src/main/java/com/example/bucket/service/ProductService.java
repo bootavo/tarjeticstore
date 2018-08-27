@@ -1,6 +1,7 @@
 package com.example.bucket.service;
 
 import com.example.bucket.model.Product;
+import com.example.bucket.repository.ProductExtraRepository;
 import com.example.bucket.repository.ProductRepository;
 import com.example.bucket.utils.ResponseHelper;
 import com.google.gson.JsonObject;
@@ -17,7 +18,7 @@ import java.math.BigInteger;
 import java.util.List;
 
 @Service
-public class ProductService {
+public class ProductService implements ProductExtraRepository {
 
     private static Logger logger = LogManager.getLogger(ProductService.class);
 
@@ -26,6 +27,7 @@ public class ProductService {
     @PersistenceContext
     private EntityManager em;
 
+    @Override
     public @ResponseBody JsonObject getProducts() {
         logger.info("#--------------INICIO DE SERVICIO getProductos()--------------#");
         JsonObject jsonResponse = null;
@@ -34,7 +36,6 @@ public class ProductService {
             data = (List<Product>) repository.findAll();
         }catch (Exception e){
             logger.info("Exception: "+e);
-            e.printStackTrace();
             data = null;
         }finally {
             ResponseHelper helper = new ResponseHelper();
@@ -44,6 +45,7 @@ public class ProductService {
         return jsonResponse;
     }
 
+    @Override
     public @ResponseBody JsonObject registerProduct(Product request){
         logger.info("#--------------INICIO DE SERVICIO getProductos()--------------#");
         JsonObject jsonResponse = null;
@@ -78,4 +80,22 @@ public class ProductService {
         return jsonResponse;
     }
 
+
+    @Override
+    public JsonObject getProductById(int id_producto) {
+        logger.info("#--------------INICIO DE SERVICIO getProductos()--------------#");
+        JsonObject jsonResponse = null;
+        Product data = null;
+        try {
+            data = repository.findById(id_producto).get();
+        }catch (Exception e){
+            logger.info("Exception: "+e);
+            data = null;
+        }finally {
+            ResponseHelper helper = new ResponseHelper();
+            jsonResponse = helper.buildResponseObject(data, "producto");
+        }
+        logger.info("#--------------FIN DE SERVICIO getProductos()--------------#");
+        return jsonResponse;
+    }
 }
